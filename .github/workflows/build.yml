@@ -1,0 +1,45 @@
+name: build
+
+on: push
+
+jobs:
+  build_win_gcc11_2:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+    - uses: msys2/setup-msys2@v2
+      with:
+        install: >-
+          make
+          unzip
+
+    - uses: actions/checkout@v2
+
+    - name: fetch gcc
+      run: |
+        curl -f -L -s https://developer.arm.com/-/media/Files/downloads/gnu/11.2-2022.02/binrel/gcc-arm-11.2-2022.02-mingw-w64-i686-arm-none-eabi.zip -o gcc-arm-11.2-2022.02-mingw-w64-i686-arm-none-eabi.zip
+        unzip -qbo gcc-arm-11.2-2022.02-mingw-w64-i686-arm-none-eabi.zip
+        mv gcc-arm-11.2-2022.02-mingw-w64-i686-arm-none-eabi gcc
+
+    - name: build
+      run: make -k -B build
+
+
+  build_mac_gcc11_2:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: fetch gcc
+      run: |
+        curl -f -L -s https://developer.arm.com/-/media/Files/downloads/gnu/11.2-2022.02/binrel/gcc-arm-11.2-2022.02-darwin-x86_64-arm-none-eabi.tar.xz -o gcc-arm-11.2-2022.02-darwin-x86_64-arm-none-eabi.tar.xz
+        tar xf gcc-arm-11.2-2022.02-darwin-x86_64-arm-none-eabi.tar.xz
+        mv gcc-arm-11.2-2022.02-darwin-x86_64-arm-none-eabi gcc
+
+    - name: build
+      run: make -k -B build
