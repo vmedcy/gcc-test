@@ -10,13 +10,15 @@ CC      := $(GCC_DIR)/bin/arm-none-eabi-gcc
 CFLAGS  := -c -O2
 
 # Source files
-SOURCES := $(sort $(wildcard $(SRC_DIR)/*.c))
+SRC_C   := $(sort $(wildcard $(SRC_DIR)/*.c))
+SRC_CPP := $(sort $(wildcard $(SRC_DIR)/*.cpp))
 
 # Object files
-OBJECTS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SOURCES))
+OBJ_C   := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_C))
+OBJ_CPP := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_CPP))
 
-# By default, compile all object files
-build: $(OBJECTS)
+# By default, compile object files for all C and C++ sources
+build: $(OBJ_C) $(OBJ_CPP)
 
 # Clean target removes all target directories
 clean:
@@ -28,6 +30,12 @@ $(OBJ_DIR):
 
 # Define recipe for compiler command
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	@echo Compiling $(notdir $<)
+	$(CC) $(CFLAGS) $< -o $@
+	@echo PASS
+	@echo
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	@echo Compiling $(notdir $<)
 	$(CC) $(CFLAGS) $< -o $@
 	@echo PASS
